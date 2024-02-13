@@ -39,14 +39,12 @@ New-AzResourceGroup -Name "DevOps-PackerResources" -Location "West Europe"
 3. Create Azure AD Service Principal, output client secret and client id
 ```
 $sp = New-AzADServicePrincipal -DisplayName "DevOps-Packer"
-$BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($sp.Secret)
-$plainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
-$plainPassword
-$sp.ApplicationId
+#TODO: Add new steps to generate the secret
+$sp.AppId
 ```
 4. Make the Service Principal a Contributor on the subscription
 ```
-New-AzRoleAssignment -RoleDefinitionName Contributor -ServicePrincipalName $sp.ApplicationId
+New-AzRoleAssignment -RoleDefinitionName Contributor -ServicePrincipalName $sp.AppId
 ```
 
 ### Azure Virtual Machine Scale Set
