@@ -54,20 +54,48 @@ module "ubuntu2004-agentpool-full" {
 }
 
 
-module "vm_azure_pipeline_first_agent" {
-  source         = "./modules/vm_azure_pipeline_first_agent"
-  location       = azurerm_resource_group.main.location
-  vm_os_simple   = "UbuntuServer"
-  public_ip_dns  = ["linsimplevmips"] // change to a unique name per datacenter region
-  vnet_subnet_id = module.vnet.vnet_subnets[0]
-  
-  tags = {
-    Environment = "test"
-  }
+module "virtual-machine" {
+  source  = "./modules/virtual-machine"
+
+
+  resource_group_name  =  azurerm_resource_group.main.name
+  location             = azurerm_resource_group.main.location
+  virtual_network_name = module.vnet.vnet_name
+  subnet_name          = module.vnet.vnet_subnets[0]
+  virtual_machine_name = "vmdeployment"
+
+
+  os_flavor               = "linux"
+  linux_distribution_name = "ubuntu2204"
+  virtual_machine_size    = "Standard_B2s"
+  generate_admin_ssh_key  = true
+  instances_count         = 1
+
+
+  enable_public_ip_address = true
+
+  nsg_inbound_rules = [
+    {
+      name                   = "ssh"
+      destination_port_range = "22"
+      source_address_prefix  = "*"
+    },
+    {
+      name                   = "http"
+      destination_port_range = "80"
+      source_address_prefix  = "*"
+    }
+  ]
+
+  enable_boot_diagnostics = false
+
+  deploy_log_analytics_agent = false
+
 }
 
 module "vnet" {
   source              = "./modules/vnet"
-  location            = azurerm_resource_group.main.location
+  vnet_location       = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
+  use_for_each        = true
 }
