@@ -22,3 +22,16 @@ variable "tags" {
 variable "identifier_publisher" {
   default = "drylabs"
 }
+
+variable "images" {
+  type = map(any)
+  default = {
+    image = {
+      publisher  = ""
+      offer      = ""
+      sku        = ""
+      definition = ""
+      osType     = ""
+    }
+  }
+}
