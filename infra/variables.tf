@@ -3,13 +3,20 @@ variable "resource_group_name" {
   default = "DevOps-PackerResources"
 }
 
+variable "resource_group_name_packer" {
+
+}
+
 variable "resource_group_location" {
   default = "eastus"
 }
 
 variable "shared_image_gallery_name" {
-  default = "gallerydrylabs"
+  default = ""
 }
+
+
+variable "vnet_name" {}
 
 variable "tags" {
   type = map(any)

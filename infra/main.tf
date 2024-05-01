@@ -11,7 +11,6 @@ provider "azurerm" {
   skip_provider_registration = true
 }
 
-
 resource "azurerm_resource_group" "main" {
   name     = var.resource_group_name
   location = var.resource_group_location
@@ -20,23 +19,23 @@ resource "azurerm_resource_group" "main" {
 }
 
 resource "azurerm_resource_group" "packer_build" {
-  name     = "rg-temp-packer2024"
+  name     = var.resource_group_name_packer
   location = var.resource_group_location
 
   tags = var.tags
 }
 
-
 resource "azurerm_shared_image_gallery" "main" {
   name                = var.shared_image_gallery_name
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
-  description         = "Shared images and things."
+
+  description = "Shared images and things."
 
   tags = var.tags
 }
 
-module "ubuntu2004-agentpool-full" {
+module "gallery_images_azure_devops" {
   for_each = var.images
 
   source                  = "./modules/shared-image"
@@ -53,20 +52,20 @@ module "ubuntu2004-agentpool-full" {
   depends_on = [azurerm_shared_image_gallery.main]
 }
 
-
 module "virtual-machine" {
-  source  = "./modules/virtual-machine"
+  source = "./modules/virtual-machine"
 
 
-  resource_group_name  =  azurerm_resource_group.main.name
+  resource_group_name  = azurerm_resource_group.main.name
   location             = azurerm_resource_group.main.location
   virtual_network_name = module.vnet.vnet_name
-  subnet_name          = module.vnet.vnet_subnets[0]
+  subnet_name          = "subnet1"
+
   virtual_machine_name = "vmdeployment"
 
 
   os_flavor               = "linux"
-  linux_distribution_name = "ubuntu2204"
+  linux_distribution_name = "ubuntu2004"
   virtual_machine_size    = "Standard_B2s"
   generate_admin_ssh_key  = true
   instances_count         = 1
@@ -87,9 +86,7 @@ module "virtual-machine" {
     }
   ]
 
-  enable_boot_diagnostics = false
-
-  deploy_log_analytics_agent = false
+  depends_on = [module.vnet]
 
 }
 
@@ -98,4 +95,11 @@ module "vnet" {
   vnet_location       = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   use_for_each        = true
+  vnet_name           = var.vnet_name
+}
+
+
+output "private_key" {
+  value = module.virtual-machine.admin_ssh_key_private
+  sensitive = true
 }
