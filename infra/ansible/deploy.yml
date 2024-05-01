@@ -1,0 +1,10 @@
+---
+- hosts: devops
+  gather_facts: no
+
+  tasks:
+    
+    - import_playbook: requirements.yml
+
+
+    - import_playbook: role-devops.yml

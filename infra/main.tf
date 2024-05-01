@@ -50,6 +50,7 @@ module "gallery_images_azure_devops" {
   os_type              = each.value["osType"]
 
   depends_on = [azurerm_shared_image_gallery.main]
+
 }
 
 module "virtual-machine" {
@@ -59,17 +60,15 @@ module "virtual-machine" {
   resource_group_name  = azurerm_resource_group.main.name
   location             = azurerm_resource_group.main.location
   virtual_network_name = module.vnet.vnet_name
-  subnet_name          = "subnet1"
+  subnet_name          = "subnet-azuredevops"
 
   virtual_machine_name = "vmdeployment"
 
-
+  instances_count         = 1
   os_flavor               = "linux"
   linux_distribution_name = "ubuntu2004"
   virtual_machine_size    = "Standard_B2s"
-  generate_admin_ssh_key  = true
-  instances_count         = 1
-
+  admin_ssh_key_data      = "~/.ssh/id_rsa.pub"
 
   enable_public_ip_address = true
 
@@ -86,9 +85,13 @@ module "virtual-machine" {
     }
   ]
 
+  tags = var.tags
+
   depends_on = [module.vnet]
 
+
 }
+
 
 module "vnet" {
   source              = "./modules/vnet"
@@ -96,10 +99,22 @@ module "vnet" {
   resource_group_name = azurerm_resource_group.main.name
   use_for_each        = true
   vnet_name           = var.vnet_name
+
+  address_space   = ["10.100.0.0/22"]
+  subnet_names    = ["subnet-azuredevops"]
+  subnet_prefixes = ["10.100.1.0/24"]
+
+  tags = var.tags
+
 }
 
+# Create (and display) an SSH key
+resource "tls_private_key" "vm" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
 
-output "private_key" {
-  value = module.virtual-machine.admin_ssh_key_private
+output "tls_private_key" {
+  value     = tls_private_key.vm.private_key_pem
   sensitive = true
 }

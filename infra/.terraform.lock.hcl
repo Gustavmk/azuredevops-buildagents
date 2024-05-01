@@ -2,7 +2,8 @@
 # Manual edits may be lost in future updates.
 
 provider "registry.opentofu.org/hashicorp/azurerm" {
-  version = "3.101.0"
+  version     = "3.101.0"
+  constraints = ">= 2.59.0, >= 3.11.0, < 4.0.0"
   hashes = [
     "h1:AvwrY4LAOB81YyMnmWm4A1393wK2x303r1b5Mgo2XLo=",
     "zh:11c218409566bd8719a3bea1d98a8c0785dc5b2244d9b73fd93bd542dc94e6ba",
@@ -19,7 +20,8 @@ provider "registry.opentofu.org/hashicorp/azurerm" {
 }
 
 provider "registry.opentofu.org/hashicorp/random" {
-  version = "3.6.1"
+  version     = "3.6.1"
+  constraints = ">= 3.1.0"
   hashes = [
     "h1:lrq9tpVBoBfEH9APjzjtqtydLf2s9VPiS/If816nPdg=",
     "zh:1208af24d1f66e858740812dd5da12e8951b1ca75cc6edb1975ba22bfdeefb1b",

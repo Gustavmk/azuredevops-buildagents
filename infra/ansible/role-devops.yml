@@ -1,0 +1,9 @@
+- hosts: agents
+  roles:
+      - gsoft.azure_devops_agent
+  vars:
+    - az_devops_agent_role: build
+    - az_devops_accountname: killsh
+    - az_devops_project_name: drylabs
+    - az_devops_accesstoken: ${{ PAT }} 
+    - az_devops_agent_pool_name: "first-pipeline"
